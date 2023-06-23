@@ -35,7 +35,7 @@ def make_model(input: int,output: int) -> Model :
     model = Sequential()
     model.add(Input(shape=(None, input)))
     model.add(Dense(128, activation="sigmoid"))
-    model.add(Dense(output, activation="sigmoid"))
+    model.add(Dense(output, activation="softmax"))
     model.compile(loss="sparse_categorical_crossentropy", optimizer="rmsprop", metrics=['accuracy'])
 
     return model
@@ -43,23 +43,27 @@ def make_model(input: int,output: int) -> Model :
 
 if __name__ == "__main__":
     X , Y = eda("Training.csv","prognosis")
-    features_order = list(set(Y))
-    features_order.sort()
-    class_to_idx = { classe : i for i, classe in enumerate(features_order)}
-    idx_to_class = { i : classe for i, classe in enumerate(features_order)}
+    features_order = X.columns
+    
+    target_order = list(set(Y))
+    target_order.sort()
+    class_to_idx = { classe : i for i, classe in enumerate(target_order)}
+    idx_to_class = { i : classe for i, classe in enumerate(target_order)}
 
     Y = np.array(list(map(lambda x : class_to_idx[x],Y)))
     print(Y)
 
     model = make_model(input = X.shape[1], output=len(list(set(Y))))
     model.summary()
-    history = model.fit(X, Y, epochs= 1)
+    history = model.fit(X, Y, epochs= 100)
 
     config = Config(
         class_to_idx = class_to_idx,
         idx_to_class = idx_to_class,
+        target_key_order=target_order,
         features_key_order=features_order,
         model=model
     )
 
     config.save()
+    print(config.features_key_order)

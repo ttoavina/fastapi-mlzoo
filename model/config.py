@@ -9,6 +9,7 @@ class Config:
     idx_to_class : Dict[int, str]
     model : Sequential
     features_key_order: List
+    target_key_order: List
 
     def save(self):
         with open("config.dat","wb") as f:
@@ -16,7 +17,7 @@ class Config:
 
     @staticmethod
     def load():
-        with open("config.dat", "r") as f:
+        with open("config.dat", "rb") as f:
             config = pickle.load(f)
 
         return config
